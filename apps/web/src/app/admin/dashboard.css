@@ -1,0 +1,321 @@
+.mm-dash-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.25rem;
+  align-items: stretch;
+  margin-bottom: 1.25rem;
+  padding: 1.4rem 1.5rem;
+  border-radius: 20px;
+  border: 1px solid rgba(16, 40, 28, 0.1);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(212, 160, 23, 0.18), transparent 42%),
+    linear-gradient(135deg, #0f3d2b 0%, #145c3d 48%, #1a7a52 100%);
+  color: #f3faf5;
+  box-shadow: 0 18px 40px rgba(11, 42, 28, 0.16);
+}
+
+.mm-dash-kicker {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(243, 250, 245, 0.72);
+}
+
+.mm-dash-title {
+  margin: 0.4rem 0 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: clamp(1.5rem, 2.4vw, 1.9rem);
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.mm-dash-copy {
+  margin: 0.55rem 0 0;
+  max-width: 36rem;
+  line-height: 1.55;
+  color: rgba(243, 250, 245, 0.84);
+  font-size: 0.95rem;
+}
+
+.mm-dash-pills {
+  display: grid;
+  gap: 0.65rem;
+  min-width: 200px;
+  align-content: center;
+}
+
+.mm-dash-pill {
+  padding: 0.75rem 0.9rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.mm-dash-pill-label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(243, 250, 245, 0.72);
+}
+
+.mm-dash-pill-value {
+  display: block;
+  margin-top: 0.25rem;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.5rem;
+  color: #fff;
+  line-height: 1;
+}
+
+.mm-dash-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.mm-dash-metric {
+  display: block;
+  padding: 1.15rem 1.2rem 1.15rem 1.35rem;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(22, 48, 34, 0.1);
+  box-shadow: 0 14px 30px rgba(11, 42, 28, 0.07);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.mm-dash-metric::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #1a7a52;
+}
+
+.mm-dash-tone-warn::before {
+  background: #d4a017;
+}
+
+.mm-dash-tone-ok::before {
+  background: #1a7a52;
+}
+
+.mm-dash-tone-accent::before {
+  background: #c45c26;
+}
+
+.mm-dash-tone-info::before {
+  background: #3d6b8a;
+}
+
+.mm-dash-metric:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(11, 42, 28, 0.12);
+}
+
+.mm-dash-metric-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.mm-dash-metric-label {
+  color: #5a6d62;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.mm-dash-metric-arrow {
+  color: rgba(20, 32, 25, 0.35);
+}
+
+.mm-dash-metric-value {
+  margin: 0.6rem 0 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 2.1rem;
+  line-height: 1;
+  color: #0b2a1c;
+}
+
+.mm-dash-metric-hint {
+  margin: 0.45rem 0 0;
+  color: #5a6d62;
+  font-size: 0.82rem;
+}
+
+.mm-dash-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1rem;
+}
+
+.mm-dash-card {
+  background: #ffffff;
+  border: 1px solid rgba(22, 48, 34, 0.1);
+  border-radius: 18px;
+  box-shadow: 0 14px 30px rgba(11, 42, 28, 0.07);
+  padding: 1.2rem;
+}
+
+.mm-dash-section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.mm-dash-section-head h2 {
+  margin: 0;
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.2rem;
+  color: #0b2a1c;
+}
+
+.mm-dash-section-head p {
+  margin: 0.35rem 0 0;
+  color: #5a6d62;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.mm-dash-slots {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.mm-dash-slot {
+  padding: 1rem 1.05rem;
+  border-radius: 16px;
+  border: 1px solid rgba(22, 48, 34, 0.1);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f9f6 100%);
+}
+
+.mm-dash-slot-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.mm-dash-slot-name {
+  font-weight: 600;
+  color: #0b2a1c;
+}
+
+.mm-dash-slot-count {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-size: 1.55rem;
+  color: #0b2a1c;
+}
+
+.mm-dash-slot-bar {
+  margin-top: 0.7rem;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(16, 40, 28, 0.08);
+  overflow: hidden;
+}
+
+.mm-dash-slot-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  min-width: 0;
+}
+
+.mm-dash-fill-breakfast {
+  background: linear-gradient(90deg, #c45c26, #d4a017);
+}
+
+.mm-dash-fill-lunch {
+  background: linear-gradient(90deg, #1a7a52, #3d9b6e);
+}
+
+.mm-dash-fill-dinner {
+  background: linear-gradient(90deg, #0f3d2b, #3d6b8a);
+}
+
+.mm-dash-slot-meta {
+  margin: 0.55rem 0 0;
+  font-size: 0.8rem;
+  color: #5a6d62;
+}
+
+.mm-dash-chart-block {
+  margin-top: 1rem;
+}
+
+.mm-dash-chart-block h3 {
+  margin: 0 0 0.65rem;
+  font-size: 0.92rem;
+  color: #0b2a1c;
+}
+
+.mm-dash-chart-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 140px) 1fr auto;
+  gap: 0.55rem;
+  align-items: center;
+  margin-bottom: 0.45rem;
+  font-size: 0.82rem;
+  color: #5a6d62;
+}
+
+.mm-dash-chart-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(16, 40, 28, 0.08);
+  overflow: hidden;
+}
+
+.mm-dash-chart-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #1a7a52, #d4a017);
+}
+
+.mm-dash-chart-row strong {
+  color: #0b2a1c;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .mm-dash-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mm-dash-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .mm-dash-hero {
+    flex-direction: column;
+  }
+
+  .mm-dash-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .mm-dash-section-head {
+    flex-direction: column;
+  }
+
+  .mm-dash-chart-row {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+}

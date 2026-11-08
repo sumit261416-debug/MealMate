@@ -1,0 +1,448 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  customer
+  kitchen_partner
+  admin
+}
+
+enum PartnerStatus {
+  draft
+  submitted
+  under_review
+  approved
+  rejected
+  suspended
+}
+
+enum MealSlotCode {
+  breakfast
+  lunch
+  dinner
+}
+
+enum OrderStatus {
+  draft
+  pending_payment
+  payment_failed
+  placed
+  accepted
+  preparing
+  ready
+  out_for_delivery
+  delivered
+  cancelled
+}
+
+enum PaymentStatus {
+  created
+  requires_action
+  succeeded
+  failed
+  refund_pending
+  partially_refunded
+  refunded
+}
+
+enum SubscriptionStatus {
+  pending_payment
+  active
+  paused
+  cancelled
+  expired
+}
+
+enum TicketStatus {
+  open
+  in_progress
+  resolved
+  closed
+}
+
+enum TicketPriority {
+  low
+  medium
+  high
+}
+
+enum RefundStatus {
+  requested
+  approved
+  rejected
+  processed
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String?   @unique
+  phone        String?   @unique
+  passwordHash String?   @map("password_hash")
+  fullName     String?   @map("full_name")
+  isActive     Boolean   @default(true) @map("is_active")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  roles             UserRole[]
+  addresses         CustomerAddress[]
+  kitchenPartner    KitchenPartner?
+  orders            Order[]            @relation("CustomerOrders")
+  subscriptions     Subscription[]
+  supportTickets    SupportTicket[]    @relation("TicketRequester")
+  assignedTickets   SupportTicket[]    @relation("TicketAssignee")
+  auditLogs         AuditLog[]
+  reviews           Review[]
+
+  @@map("users")
+}
+
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  role      RoleName
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, role])
+  @@map("user_roles")
+}
+
+model CustomerAddress {
+  id             String   @id @default(cuid())
+  userId         String   @map("user_id")
+  label          String?
+  line1          String
+  line2          String?
+  pgName         String?  @map("pg_name")
+  roomFlat       String?  @map("room_flat")
+  landmark       String?
+  instructions   String?
+  serviceAreaId  String?  @map("service_area_id")
+  isDefault      Boolean  @default(false) @map("is_default")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  serviceArea ServiceArea? @relation(fields: [serviceAreaId], references: [id])
+  orders      Order[]
+
+  @@index([userId])
+  @@map("customer_addresses")
+}
+
+model ServiceArea {
+  id          String   @id @default(cuid())
+  name        String
+  code        String   @unique
+  isActive    Boolean  @default(true) @map("is_active")
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  addresses       CustomerAddress[]
+  partnerAreas    KitchenPartnerServiceArea[]
+  orders          Order[]
+
+  @@map("service_areas")
+}
+
+model MealSlot {
+  id              String       @id @default(cuid())
+  code            MealSlotCode @unique
+  displayName     String       @map("display_name")
+  cutoffHour      Int          @map("cutoff_hour")
+  cutoffMinute    Int          @default(0) @map("cutoff_minute")
+  cutoffPrevDay   Boolean      @default(false) @map("cutoff_prev_day")
+  isActive        Boolean      @default(true) @map("is_active")
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  orders Order[]
+
+  @@map("meal_slots")
+}
+
+model KitchenPartner {
+  id           String        @id @default(cuid())
+  userId       String        @unique @map("user_id")
+  businessName String        @map("business_name")
+  contactPhone String?       @map("contact_phone")
+  contactEmail String?       @map("contact_email")
+  status       PartnerStatus @default(draft)
+  rejectionReason String?    @map("rejection_reason")
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  user         User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  serviceAreas KitchenPartnerServiceArea[]
+  menus        Menu[]
+  orders       Order[]
+  documents    PartnerDocument[]
+
+  @@index([status])
+  @@map("kitchen_partners")
+}
+
+model KitchenPartnerServiceArea {
+  partnerId     String @map("partner_id")
+  serviceAreaId String @map("service_area_id")
+
+  partner     KitchenPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  serviceArea ServiceArea    @relation(fields: [serviceAreaId], references: [id], onDelete: Cascade)
+
+  @@id([partnerId, serviceAreaId])
+  @@map("kitchen_partner_service_areas")
+}
+
+model PartnerDocument {
+  id           String   @id @default(cuid())
+  partnerId    String   @map("partner_id")
+  docType      String   @map("doc_type")
+  storageKey   String   @map("storage_key")
+  originalName String?  @map("original_name")
+  mimeType     String?  @map("mime_type")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  partner KitchenPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@map("partner_documents")
+}
+
+model Menu {
+  id          String   @id @default(cuid())
+  partnerId   String   @map("partner_id")
+  title       String
+  isPublished Boolean  @default(false) @map("is_published")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  partner KitchenPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  items   MenuItem[]
+
+  @@index([partnerId])
+  @@map("menus")
+}
+
+model MenuItem {
+  id            String   @id @default(cuid())
+  menuId        String   @map("menu_id")
+  name          String
+  description   String?
+  pricePaise    Int      @map("price_paise")
+  isVeg         Boolean  @default(true) @map("is_veg")
+  allergens     String?
+  dailyCapacity Int?     @map("daily_capacity")
+  isAvailable   Boolean  @default(true) @map("is_available")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  menu Menu @relation(fields: [menuId], references: [id], onDelete: Cascade)
+
+  @@index([menuId])
+  @@map("menu_items")
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  customerId      String      @map("customer_id")
+  partnerId       String      @map("partner_id")
+  addressId       String?     @map("address_id")
+  serviceAreaId   String?     @map("service_area_id")
+  mealSlotId      String?     @map("meal_slot_id")
+  status          OrderStatus @default(draft)
+  subtotalPaise   Int         @default(0) @map("subtotal_paise")
+  deliveryFeePaise Int        @default(0) @map("delivery_fee_paise")
+  platformFeePaise Int        @default(0) @map("platform_fee_paise")
+  taxPaise        Int         @default(0) @map("tax_paise")
+  totalPaise      Int         @default(0) @map("total_paise")
+  idempotencyKey  String?     @unique @map("idempotency_key")
+  deliveryDate    DateTime?   @map("delivery_date") @db.Date
+  notes           String?
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime    @updatedAt @map("updated_at") @db.Timestamptz
+
+  customer    User             @relation("CustomerOrders", fields: [customerId], references: [id])
+  partner     KitchenPartner   @relation(fields: [partnerId], references: [id])
+  address     CustomerAddress? @relation(fields: [addressId], references: [id])
+  serviceArea ServiceArea?     @relation(fields: [serviceAreaId], references: [id])
+  mealSlot    MealSlot?        @relation(fields: [mealSlotId], references: [id])
+  items       OrderItem[]
+  statusHistory OrderStatusHistory[]
+  payments    Payment[]
+  deliveryTask DeliveryTask?
+  reviews     Review[]
+  tickets     SupportTicket[]
+
+  @@index([customerId])
+  @@index([partnerId])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id               String @id @default(cuid())
+  orderId          String @map("order_id")
+  menuItemId       String? @map("menu_item_id")
+  nameSnapshot     String @map("name_snapshot")
+  pricePaiseSnapshot Int  @map("price_paise_snapshot")
+  quantity         Int
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("order_items")
+}
+
+model OrderStatusHistory {
+  id        String      @id @default(cuid())
+  orderId   String      @map("order_id")
+  fromStatus OrderStatus? @map("from_status")
+  toStatus  OrderStatus @map("to_status")
+  note      String?
+  actorId   String?     @map("actor_id")
+  createdAt DateTime    @default(now()) @map("created_at") @db.Timestamptz
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("order_status_history")
+}
+
+model Subscription {
+  id              String             @id @default(cuid())
+  customerId      String             @map("customer_id")
+  partnerId       String             @map("partner_id")
+  status          SubscriptionStatus @default(pending_payment)
+  mealsTotal      Int                @map("meals_total")
+  mealsRemaining  Int                @map("meals_remaining")
+  pricePaise      Int                @map("price_paise")
+  startDate       DateTime           @map("start_date") @db.Date
+  endDate         DateTime?          @map("end_date") @db.Date
+  createdAt       DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime           @updatedAt @map("updated_at") @db.Timestamptz
+
+  customer User @relation(fields: [customerId], references: [id])
+
+  @@index([customerId])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  orderId         String?       @map("order_id")
+  provider        String        @default("pending")
+  providerRef     String?       @map("provider_ref")
+  amountPaise     Int           @map("amount_paise")
+  currency        String        @default("INR")
+  status          PaymentStatus @default(created)
+  idempotencyKey  String?       @unique @map("idempotency_key")
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  order   Order?   @relation(fields: [orderId], references: [id])
+  refunds Refund[]
+
+  @@index([orderId])
+  @@map("payments")
+}
+
+model Refund {
+  id             String       @id @default(cuid())
+  paymentId      String       @map("payment_id")
+  orderId        String       @map("order_id")
+  amountPaise    Int          @map("amount_paise")
+  reason         String
+  status         RefundStatus @default(requested)
+  decisionNote   String?      @map("decision_note")
+  decidedById    String?      @map("decided_by_id")
+  decidedAt      DateTime?    @map("decided_at") @db.Timestamptz
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([orderId])
+  @@map("refunds")
+}
+
+model DeliveryTask {
+  id           String   @id @default(cuid())
+  orderId      String   @unique @map("order_id")
+  assigneeName String?  @map("assignee_name")
+  status       String   @default("unassigned")
+  podNote      String?  @map("pod_note")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("delivery_tasks")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  orderId    String   @map("order_id")
+  customerId String   @map("customer_id")
+  rating     Int
+  comment    String?
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customer User  @relation(fields: [customerId], references: [id])
+
+  @@unique([orderId, customerId])
+  @@map("reviews")
+}
+
+model SupportTicket {
+  id           String         @id @default(cuid())
+  requesterId  String         @map("requester_id")
+  assigneeId   String?        @map("assignee_id")
+  orderId      String?        @map("order_id")
+  subject      String
+  body         String
+  status       TicketStatus   @default(open)
+  priority     TicketPriority @default(medium)
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime       @updatedAt @map("updated_at") @db.Timestamptz
+
+  requester User   @relation("TicketRequester", fields: [requesterId], references: [id])
+  assignee  User?  @relation("TicketAssignee", fields: [assigneeId], references: [id])
+  order     Order? @relation(fields: [orderId], references: [id])
+
+  @@index([status])
+  @@map("support_tickets")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?  @map("actor_id")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  metadata   Json?
+  ip         String?
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model AppSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("app_settings")
+}

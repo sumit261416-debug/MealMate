@@ -1,0 +1,45 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# env & secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# builds
+dist/
+build/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+.expo/
+
+# Flutter (future)
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/ios/Pods/
+**/android/.gradle/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# logs & dumps
+*.log
+npm-debug.log*
+*.sql.gz
+backups/
+
+# prisma
+apps/api/prisma/*.db
+apps/api/prisma/*.db-journal
+
+# private partner documents (local storage)
+apps/api/storage/

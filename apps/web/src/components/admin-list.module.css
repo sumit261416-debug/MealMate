@@ -1,0 +1,31 @@
+.wrap {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.toolbar {
+  padding: 0.85rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(22, 48, 34, 0.1);
+  box-shadow: 0 10px 24px rgba(11, 42, 28, 0.05);
+}
+
+.panel {
+  padding: 1.15rem !important;
+}
+
+.state {
+  animation: rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
